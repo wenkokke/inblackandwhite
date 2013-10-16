@@ -1,5 +1,5 @@
 from __future__ import print_function
-from os         import remove
+from os         import system, remove
 from os.path    import basename, dirname, splitext
 from urllib     import urlretrieve
 from itertools  import islice
@@ -92,3 +92,5 @@ if len(posts) == 0:
     print("no new posts")
 else:
     handlephotos(client,config['target_blog'],config['lastid_file'],reversed(posts))
+
+system("pause")
