@@ -1,6 +1,6 @@
 from __future__ import print_function
-from os         import system, remove
-from os.path    import basename, dirname, splitext
+from os         import system, remove, chdir
+from os.path    import basename, abspath, dirname, splitext
 from urllib     import urlretrieve
 from itertools  import islice
 from time       import sleep
@@ -26,7 +26,7 @@ def setlastid(path,id,n=10):
 def getphotos(client,blogname,lastid,offset=0,limit=20):
     """Read photo-posts from a Tumblr blog until an id matches lastid."""
     result = []
-    photos = client.posts(blogname, type='photo', limit=limit, offset=offset)['posts']
+    photos = client.posts(blogname, 'photo', limit=str( limit ), offset=str( offset ))['posts']
     for photo in photos:
         if photo['id'] == lastid:
             return result
@@ -71,19 +71,22 @@ def uploadphoto(client,blogname,post,image_files):
     tags.extend(post['tags'])
     client.create_photo(blogname, state = 'queue', tags = tags, link = post['post_url'], data = image_files)
 
+# move to the scripts directory
+chdir(dirname(abspath(__file__)))
+
 # load the configuration file
 with open("config.yaml",'r') as fp: config = load(fp)
-    
+
 # setup a tumblr client
 client = TumblrRestClient(
     consumer_key    = config['consumer_key'],
     consumer_secret = config['consumer_secret'],
     oauth_token     = config['oauth_token'],
     oauth_secret    = config['oauth_secret'])
-    
+
 # retrieve last-handled id from lastid-file
 lastid = getlastid(config['lastid_file'])
-    
+
 # retrieve new photo-posts from tumblr
 posts = getphotos(client,config['source_blog'],lastid)
 
@@ -92,5 +95,3 @@ if len(posts) == 0:
     print("no new posts")
 else:
     handlephotos(client,config['target_blog'],config['lastid_file'],reversed(posts))
-
-system("pause")
