@@ -1,4 +1,4 @@
 inblackandwhite
 ===============
 
-Script to create and maintain a grayscale copy of a Tumblr blog.
+ A script which maintains a greyscale copy of a tumblr blog.
